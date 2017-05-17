@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String AES = "AES";
+    private static final String ERROR_TEXT = "(・A・)";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,21 @@ public class MainActivity extends AppCompatActivity {
         return ret;
     }
 
+    private String getEncryptionType() {
+        StringBuilder sb = new StringBuilder();
+        String string = ERROR_TEXT.replace("・", "");
+        string = string.replace("(", "");
+        string = string.replace(")", "");
+        sb.append(string);
+        byte val[] = new byte[1];
+        val[0] = 0x53;
+        sb.append("E");
+        sb.append(new String(val));
+
+        String ret = sb.toString();
+        return ret;
+    }
+
     private String loadText(String filename) {
         BufferedReader reader = null;
         try {
@@ -73,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             reader.close();
             return sb.toString();
         } catch (IOException e) {
-            return "(・A・)";
+            return ERROR_TEXT;
         }
     }
 
@@ -83,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
         byte[] originalBytes = originalString.getBytes();
         byte[] secretKeyBytes = secretKey.getBytes();
 
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKeyBytes, AES);
-        Cipher cipher = Cipher.getInstance(AES);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKeyBytes, getEncryptionType());
+        Cipher cipher = Cipher.getInstance(getEncryptionType());
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         byte[] encryptBytes = cipher.doFinal(originalBytes);
         byte[] encryptBytesBase64 = Base64.encode(encryptBytes, Base64.DEFAULT);
@@ -101,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
 //        byte[] encryptBytes = Base64.decodeBase64(encryptBytesBase64String);
         byte[] secretKeyBytes = secretKey.getBytes();
 
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKeyBytes, AES);
-        Cipher cipher = Cipher.getInstance(AES);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKeyBytes, getEncryptionType());
+        Cipher cipher = Cipher.getInstance(getEncryptionType());
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
         byte[] originalBytes = cipher.doFinal(encryptBytes);
 
