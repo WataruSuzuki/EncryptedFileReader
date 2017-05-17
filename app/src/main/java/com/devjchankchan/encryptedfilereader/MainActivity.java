@@ -23,36 +23,48 @@ import javax.crypto.spec.SecretKeySpec;
 public class MainActivity extends AppCompatActivity {
 
     private static final String AES = "AES";
-    private static final String KEY = "0123456789ABCDEF";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        writeFile();
         TextView textView = (TextView) findViewById(R.id.textview);
         try {
-            textView.setText(decrypt(loadText(), KEY));
+//            textView.setText(loadText("encrypted.txt"));
+            textView.setText(decrypt(loadText("encrypted.txt"), getKey()));
         } catch (Exception e) {
 
         }
-//        writeFile();
     }
 
     private void writeFile() {
         try {
-            FileWriter writer = new FileWriter(new File(Environment.getExternalStorageDirectory().toString(), "test.txt"));
-            writer.write(encrypt(loadText(), KEY));
+            FileWriter writer = new FileWriter(new File(Environment.getExternalStorageDirectory().toString(), "encrypted.txt"));
+            writer.write(encrypt(loadText("test.txt"), getKey()));
             writer.close();
         } catch (Exception e) {
 
         }
     }
 
-    private String loadText() {
+    private String getKey() {
+        // "ABCDEFGHIJKLMNOP"を返却します
+        byte val[] = new byte[16];
+        int value = 65;
+        for (int i = 0; i < 16; i++) {
+            val[i] = Byte.valueOf(String.valueOf(value + i));
+        }
+
+        String ret = new String(val);
+        return ret;
+    }
+
+    private String loadText(String filename) {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(getAssets().open("test.txt")));
+            reader = new BufferedReader(new InputStreamReader(getAssets().open(filename)));
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
